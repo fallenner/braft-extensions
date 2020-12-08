@@ -3,6 +3,8 @@
  * Thanks very much for the contributors of draft-js-markdown-shortcuts-plugin!!!
  */
 
+import MarkdownParser from 'marked'
+import { ContentUtils } from 'braft-utils'
 import handleBlockType from './modifiers/handleBlockType'
 import handleInlineStyle from './modifiers/handleInlineStyle'
 import handleNewCodeBlock from './modifiers/handleNewCodeBlock'
@@ -12,7 +14,7 @@ import handleImage from './modifiers/handleImage'
 import leaveList from './modifiers/leaveList'
 import insertText from './modifiers/insertText'
 import changeCurrentBlockType from './modifiers/changeCurrentBlockType'
-import { replaceText } from './utils'
+// import { replaceText } from './utils'
 
 function checkCharacterForState(editorState, character) {
   let newEditorState = handleBlockType(editorState, character)
@@ -104,38 +106,9 @@ export default (options) => {
               return 'not-handled'
             },
             handlePastedText(text, html, editorState, editor) {
-              if (html) {
-                return 'not-handled'
-              }
-              let newEditorState = editorState
-              let buffer = []
-              for (let i = 0; i < text.length; i++) { // eslint-disable-line no-plusplus
-                if (text[i].match(/[^A-z0-9_*~`]/)) {
-                  newEditorState = replaceText(newEditorState, buffer.join('') + text[i])
-                  newEditorState = checkCharacterForState(newEditorState, text[i])
-                  buffer = []
-                } else if (text[i].charCodeAt(0) === 10) {
-                  newEditorState = replaceText(newEditorState, buffer.join(''))
-                  const tmpEditorState = checkReturnForState(newEditorState, {}, insertEmptyBlockOnReturnWithModifierKey)
-                  if (newEditorState === tmpEditorState) {
-                    newEditorState = insertEmptyBlock(tmpEditorState)
-                  } else {
-                    newEditorState = tmpEditorState
-                  }
-                  buffer = []
-                } else if (i === text.length - 1) {
-                  newEditorState = replaceText(newEditorState, buffer.join('') + text[i])
-                  buffer = []
-                } else {
-                  buffer.push(text[i])
-                }
-              }
-        
-              if (editorState !== newEditorState) {
-                editor.setValue(newEditorState)
-                return 'handled'
-              }
-              return 'not-handled'
+              const newHtml = MarkdownParser(text)
+              editor.setValue(ContentUtils.insertHTML(editorState, newHtml, 'paste'))
+              return 'handled'
             }
           }
         }
