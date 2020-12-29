@@ -1,6 +1,6 @@
 {
   "name": "@starfall/braft-extensions",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Extensions for Braft Editor",
   "main": "dist/index.js",
   "scripts": {

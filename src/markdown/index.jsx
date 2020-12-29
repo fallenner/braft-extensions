@@ -106,6 +106,10 @@ export default (options) => {
               return 'not-handled'
             },
             handlePastedText(text, html, editorState, editor) {
+              const blocks = ContentUtils.getSelectedBlocks(editorState)
+              if (blocks && blocks[0] && blocks[0].type === 'code-block') {
+                return 'not-handled'
+              }
               const newHtml = MarkdownParser(text)
               editor.setValue(ContentUtils.insertHTML(editorState, newHtml, 'paste'))
               return 'handled'

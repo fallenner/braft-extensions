@@ -3471,6 +3471,12 @@ function checkReturnForState(editorState, ev, insertEmptyBlockOnReturnWithModifi
           return 'not-handled';
         },
         handlePastedText: function handlePastedText(text, html, editorState, editor) {
+          var blocks = external_braft_utils_["ContentUtils"].getSelectedBlocks(editorState);
+
+          if (blocks && blocks[0] && blocks[0].type === 'code-block') {
+            return 'not-handled';
+          }
+
           var newHtml = marked_default()(text);
           editor.setValue(external_braft_utils_["ContentUtils"].insertHTML(editorState, newHtml, 'paste'));
           return 'handled';
